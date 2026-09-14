@@ -14,6 +14,7 @@
 #include "ShooterProjectile.h"
 #include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
+#include "InputCoreTypes.h"
 
 AMyProjectTestCharacter::AMyProjectTestCharacter()
 {
@@ -68,7 +69,8 @@ void AMyProjectTestCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMyProjectTestCharacter::Move);
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &AMyProjectTestCharacter::Look);
 
-		// Legacy mapping keeps the firing action usable without creating a new input asset.
+		// Bind the physical controls directly so firing does not rely on a separate input asset.
+		PlayerInputComponent->BindKey(EKeys::LeftMouseButton, IE_Pressed, this, &AMyProjectTestCharacter::Fire);
 		PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &AMyProjectTestCharacter::Fire);
 
 		// Looking

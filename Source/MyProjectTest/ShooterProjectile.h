@@ -21,6 +21,8 @@ public:
 	AShooterProjectile();
 
 protected:
+	virtual void BeginPlay() override;
+
 	UPROPERTY(VisibleAnywhere, Category="Components")
 	TObjectPtr<USphereComponent> Collision;
 

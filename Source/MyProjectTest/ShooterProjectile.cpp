@@ -10,7 +10,7 @@
 AShooterProjectile::AShooterProjectile()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	InitialLifeSpan = 3.f;
+	InitialLifeSpan = 5.f;
 
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	Collision->InitSphereRadius(10.f);
@@ -21,7 +21,7 @@ AShooterProjectile::AShooterProjectile()
 	Visual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Visual"));
 	Visual->SetupAttachment(Collision);
 	Visual->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Visual->SetRelativeScale3D(FVector(0.18f));
+	Visual->SetRelativeScale3D(FVector(0.8f));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereMesh(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
 	if (SphereMesh.Succeeded())
 	{
@@ -29,12 +29,22 @@ AShooterProjectile::AShooterProjectile()
 	}
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-	ProjectileMovement->InitialSpeed = 3200.f;
-	ProjectileMovement->MaxSpeed = 3200.f;
+	ProjectileMovement->InitialSpeed = 2200.f;
+	ProjectileMovement->MaxSpeed = 2200.f;
 	ProjectileMovement->ProjectileGravityScale = 0.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 
 	Collision->OnComponentHit.AddDynamic(this, &AShooterProjectile::OnProjectileHit);
+}
+
+void AShooterProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+	if (AActor* OwnerActor = GetOwner())
+	{
+		// A third-person projectile starts close to the player, so never let it hit its shooter.
+		Collision->IgnoreActorWhenMoving(OwnerActor, true);
+	}
 }
 
 void AShooterProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor,
