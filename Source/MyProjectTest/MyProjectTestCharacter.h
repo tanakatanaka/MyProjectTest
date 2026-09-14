@@ -1,0 +1,108 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Character.h"
+#include "Logging/LogMacros.h"
+#include "MyProjectTestCharacter.generated.h"
+
+class USpringArmComponent;
+class UCameraComponent;
+class UInputAction;
+class AShooterProjectile;
+struct FInputActionValue;
+
+DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
+
+/**
+ *  A simple player-controllable third person character
+ *  Implements a controllable orbiting camera
+ */
+UCLASS(abstract)
+class AMyProjectTestCharacter : public ACharacter
+{
+	GENERATED_BODY()
+
+	/** Camera boom positioning the camera behind the character */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* CameraBoom;
+
+	/** Follow camera */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* FollowCamera;
+	
+protected:
+
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* JumpAction;
+
+	/** Move Input Action */
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* MoveAction;
+
+	/** Look Input Action */
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* LookAction;
+
+	/** Mouse Look Input Action */
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* MouseLookAction;
+
+	/** Projectile class fired by the built-in shooting action. */
+	UPROPERTY(EditDefaultsOnly, Category="Combat")
+	TSubclassOf<AShooterProjectile> ProjectileClass;
+
+	/** Offset from the camera so shots do not collide with the player. */
+	UPROPERTY(EditDefaultsOnly, Category="Combat", meta=(ClampMin="0.0"))
+	float MuzzleOffset = 120.f;
+
+public:
+
+	/** Constructor */
+	AMyProjectTestCharacter();	
+
+protected:
+
+	/** Initialize input action bindings */
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+protected:
+
+	/** Called for movement input */
+	void Move(const FInputActionValue& Value);
+
+	/** Called for looking input */
+	void Look(const FInputActionValue& Value);
+
+	/** Fires one projectile in the direction the player is looking. */
+	void Fire();
+
+public:
+
+	/** Handles move inputs from either controls or UI interfaces */
+	UFUNCTION(BlueprintCallable, Category="Input")
+	virtual void DoMove(float Right, float Forward);
+
+	/** Handles look inputs from either controls or UI interfaces */
+	UFUNCTION(BlueprintCallable, Category="Input")
+	virtual void DoLook(float Yaw, float Pitch);
+
+	/** Handles jump pressed inputs from either controls or UI interfaces */
+	UFUNCTION(BlueprintCallable, Category="Input")
+	virtual void DoJumpStart();
+
+	/** Handles jump pressed inputs from either controls or UI interfaces */
+	UFUNCTION(BlueprintCallable, Category="Input")
+	virtual void DoJumpEnd();
+
+public:
+
+	/** Returns CameraBoom subobject **/
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
+	/** Returns FollowCamera subobject **/
+	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+};
+

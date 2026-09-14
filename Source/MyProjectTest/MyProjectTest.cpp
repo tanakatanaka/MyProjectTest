@@ -1,0 +1,8 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
+#include "MyProjectTest.h"
+#include "Modules/ModuleManager.h"
+
+IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, MyProjectTest, "MyProjectTest" );
+
+DEFINE_LOG_CATEGORY(LogMyProjectTest)
