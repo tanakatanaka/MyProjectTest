@@ -6,6 +6,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Roguelike/RogueGameMode.h"
 
 AShooterProjectile::AShooterProjectile()
 {
@@ -52,7 +53,12 @@ void AShooterProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent, AAct
 {
 	if (OtherActor && OtherActor != GetOwner())
 	{
-		UGameplayStatics::ApplyPointDamage(OtherActor, 25.f, GetVelocity().GetSafeNormal(), Hit,
+		float Damage = 25.f;
+		if (const ARogueGameMode* GM = GetWorld()->GetAuthGameMode<ARogueGameMode>())
+		{
+			Damage = GM->ScaleProjectileDamage(Damage);
+		}
+		UGameplayStatics::ApplyPointDamage(OtherActor, Damage, GetVelocity().GetSafeNormal(), Hit,
 			GetInstigatorController(), this, UDamageType::StaticClass());
 	}
 	Destroy();
